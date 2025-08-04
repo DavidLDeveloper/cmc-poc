@@ -1,0 +1,24 @@
+// Curl format:
+
+GET http://localhost:3000/health
+
+###
+
+GET http://localhost:3000/notHere
+
+###
+
+// Test page
+GET http://localhost:3000/test-page
+###
+GET http://localhost:3000/data?url=/test-page
+###
+POST http://localhost:3000/create HTTP/1.1
+content-type: application/json
+
+{
+    "content": "# Test MD 2 content\nThis is MORE MORE content. and some more, and even more",
+    "url": "/test-page"
+}
+###
+POST http://localhost:3000/build?url=/test-page

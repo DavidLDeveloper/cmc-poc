@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Page Editor</title>
+    <script src="https://unpkg.com/tiny-markdown-editor/dist/tiny-mde.min.js"></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://unpkg.com/tiny-markdown-editor/dist/tiny-mde.min.css"
+    />
+  </head>
+  <body>
+    <div>
+      URL: <span id="urlLabel"></span
+      ><button onclick="handleClick()">Save</button>
+    </div>
+    <div id="toolbar"></div>
+    <div id="editor"></div>
+    <textarea id="txt">{contents}</textarea>
+  </body>
+  <script type="text/javascript">
+    var tinyMDE = new TinyMDE.Editor({
+      //   element: "editor",
+      textarea: "txt",
+    });
+    var commandBar = new TinyMDE.CommandBar({
+      element: "toolbar",
+      editor: tinyMDE,
+      commands: [
+        "bold",
+        "italic",
+        "strikethrough",
+        "|",
+        "code",
+        "|",
+        "h1",
+        "h2",
+        "|",
+        "ul",
+        "ol",
+        "|",
+        "blockquote",
+        "hr",
+        "|",
+        "insertLink",
+        "insertImage",
+      ],
+    });
+  </script>
+
+  <script>
+    const params = new URLSearchParams(document.location.search);
+    const urlLabel = document.getElementById("urlLabel");
+    urlLabel.innerText = params.get("url");
+
+    async function updateContent() {
+      const resp = await window.fetch(`/data?url=${params.get("url")}`);
+      const data = await resp.json();
+      console.log(data);
+      tinyMDE.setContent(data.content);
+    }
+    updateContent();
+  </script>
+  <script>
+    async function handleClick() {
+      if (window.confirm("Overwrite existing content?")) {
+        await window.fetch("/create", {
+          headers: { "content-type": "application/json" },
+          method: "POST",
+          body: JSON.stringify({
+            url: params.get("url"),
+            content: tinyMDE.getContent(),
+          }),
+        });
+      }
+    }
+  </script>
+</html>
