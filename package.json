@@ -7,8 +7,10 @@
   "type": "module",
   "main": "server.mjs",
   "scripts": {
-    "dev": "nodemon server.mjs",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "ENVIRONMENT=dev nodemon server.js",
+    "start": "node dist/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c"
   },
   "dependencies": {
     "body-parser": "^2.2.0",
@@ -16,5 +18,9 @@
     "marked": "^16.1.1",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "rollup": "^4.46.2",
+    "rollup-plugin-copy": "^3.5.0"
   }
 }

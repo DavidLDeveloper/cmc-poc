@@ -4,6 +4,7 @@ import { Sequelize, Model, DataTypes } from "sequelize";
 const sequelize = new Sequelize({
   dialect: "sqlite",
   storage: "dist/db/database.sqlite",
+  logging: process.env.ENVIRONMENT === "dev",
 });
 
 // Define Page model
