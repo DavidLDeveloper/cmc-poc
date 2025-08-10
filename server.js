@@ -3,6 +3,8 @@ import path from "path";
 import bodyParser from "body-parser";
 import pageController from "./src/controller/page-controller.js";
 import editorRouter from "./src/controller/editor-controller.js";
+import { exec } from "child_process";
+
 const app = express();
 app.use(bodyParser.json());
 
@@ -33,6 +35,19 @@ app.use((req, res) => {
 });
 
 // Startup:
+// if (process.env.ENVIRONMENT === "dev") {
+//   console.log("Compiling TailwindCSS...");
+//   exec(
+//     "npx @tailwindcss/cli -i ./src/input.css -o ./dist/static/styles.css",
+//     (err, msg) => {
+//       if (!err) {
+//         console.log("Done.");
+//       } else {
+//         console.log("Tailwind Error: \n", err);
+//       }
+//     }
+//   );
+// }
 console.log(`
   ---------------
   CMC-MVP Server

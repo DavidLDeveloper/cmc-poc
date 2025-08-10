@@ -4,7 +4,5 @@
 - - add to model for variables???
 - add htmx for dyanmic content?
 - add alpine.js for interactive content?
-- add bundle.js and rollup.
-- add build/startup scripts.
-- add css, tailwind?
-- add prod/dev modes to server.s
+- move packages off cdn delivery.ss
+- add style.

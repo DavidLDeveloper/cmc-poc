@@ -9,7 +9,10 @@ export default [
     },
     plugins: [
       copy({
-        targets: [{ src: "src/components", dest: "dist/src" }],
+        targets: [
+          { src: "src/components", dest: "dist/src" },
+          { src: "src/styles.css", dist: "dist/static" },
+        ],
       }),
     ],
   },
