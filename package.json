@@ -8,7 +8,7 @@
   "main": "server.mjs",
   "scripts": {
     "start:dev": "ENVIRONMENT=dev nodemon server.js",
-    "tailwind:watch": "npx @tailwindcss/cli -i ./src/input.css -o ./dist/static/styles.css --watch",
+    "tailwind:watch": "npx @tailwindcss/cli -i ./src/styles.css -o ./.content/styles.css --watch",
     "start": "node dist/server.js",
     "dev": "concurrently  \"npm run start:dev\" \"npm run tailwind:watch\"",
     "test": "echo \"Error: no test specified\" && exit 1",

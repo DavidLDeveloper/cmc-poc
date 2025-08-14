@@ -1,9 +1,8 @@
 import express from "express";
 import path from "path";
 import bodyParser from "body-parser";
-import pageController from "./src/controller/page-controller.js";
+import pageController, { preview } from "./src/controller/page-controller.js";
 import editorRouter from "./src/controller/editor-controller.js";
-import { exec } from "child_process";
 
 const app = express();
 app.use(bodyParser.json());
@@ -26,28 +25,18 @@ app.use("/editor", editorRouter);
 // Static Content Module -- dev modes
 const contentDir = path.join(
   __dirname,
-  `${process.env.ENVIRONMENT === "dev" ? "dist/" : ""}static`
+  `${process.env.ENVIRONMENT === "dev" ? ".content" : "static"}`
 );
 
 app.use(express.static(contentDir));
+if (process.env.ENVIRONMENT === "dev") {
+  // In dev: preview pages from DB if they exist. Placed after `express.static` to serve that first if it exists.
+  app.use(preview);
+}
 app.use((req, res) => {
   res.send("404");
 });
 
-// Startup:
-// if (process.env.ENVIRONMENT === "dev") {
-//   console.log("Compiling TailwindCSS...");
-//   exec(
-//     "npx @tailwindcss/cli -i ./src/input.css -o ./dist/static/styles.css",
-//     (err, msg) => {
-//       if (!err) {
-//         console.log("Done.");
-//       } else {
-//         console.log("Tailwind Error: \n", err);
-//       }
-//     }
-//   );
-// }
 console.log(`
   ---------------
   CMC-MVP Server

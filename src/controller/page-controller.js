@@ -6,10 +6,12 @@ import { createPageHTML } from "./helpers/page.js";
 
 const router = express.Router();
 
+const buildDir =
+  process.env.ENVIRONMENT === "dev" ? ".content/" : "/dist/static/";
 // Build a page into ./dist/static
 router.post("/build", async (req, res) => {
   const { url } = req.query;
-  const filePath = path.join("dist/static/", url);
+  const filePath = path.join(buildDir, url);
   const data = await readPage(url);
   if (data) {
     fs.mkdirSync(filePath, {
@@ -25,6 +27,18 @@ router.post("/build", async (req, res) => {
   }
 });
 
+export const preview = async (req, res, next) => {
+  const url = req.url;
+  const data = await readPage(url);
+  if (data) {
+    console.log("Previewing:", url);
+    const pageContent = createPageHTML(null, data.content);
+    res.send(pageContent);
+  } else {
+    next();
+  }
+};
+
 // Create or update a page in the DB based on on url as the key.
 router.post("/create", async (req, res) => {
   if (!req.body?.content && !req.body?.url) {
@@ -39,7 +53,6 @@ router.post("/create", async (req, res) => {
 
 // Fetch the DB entry for a url.
 router.get("/data", async (req, res) => {
-  console.log(":::DATA:::");
   const data = await readPage(req.query.url);
   res.json(data);
 });

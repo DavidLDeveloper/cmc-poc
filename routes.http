@@ -18,7 +18,7 @@ content-type: application/json
 
 {
     "content": "# Test MD 2 content\nThis is MORE MORE content. and some more, and even more",
-    "url": "/test-page"
+    "url": "/test-page2"
 }
 ###
 POST http://localhost:3000/build?url=/test-page

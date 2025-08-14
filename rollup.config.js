@@ -11,7 +11,7 @@ export default [
       copy({
         targets: [
           { src: "src/components", dest: "dist/src" },
-          { src: "src/styles.css", dist: "dist/static" },
+          { src: ".content/styles.css", dest: "dist/static" },
         ],
       }),
     ],
