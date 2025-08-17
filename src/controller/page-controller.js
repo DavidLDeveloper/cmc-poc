@@ -1,5 +1,9 @@
 import express from "express";
-import { readPage, updateOrCreatePage } from "../model/helpers/page.js";
+import {
+  readPage,
+  updateOrCreatePage,
+  updateStatus,
+} from "../model/helpers/page.js";
 import fs from "fs";
 import path from "path";
 import { createPageHTML } from "./helpers/page.js";
@@ -11,8 +15,9 @@ const buildDir =
 // Build a page into ./dist/static
 router.post("/build", async (req, res) => {
   const { url } = req.query;
-  const filePath = path.join(buildDir, url);
+  const filePath = path.join(".", buildDir, url);
   const data = await readPage(url);
+
   if (data) {
     fs.mkdirSync(filePath, {
       recursive: true,
@@ -21,9 +26,40 @@ router.post("/build", async (req, res) => {
       `${filePath}/index.html`,
       createPageHTML(null, data.content)
     );
+    await updateStatus(url, true);
     res.json({ status: "success", path: req.path, route: url, filePath });
   } else {
     res.json({ status: "failed", message: "Page data not found." });
+  }
+});
+
+router.put("/unbuild", async (req, res) => {
+  const { url } = req.query;
+  const filePath = path.join(".", buildDir, url);
+  console.log("Removing path:", url);
+  if (fs.existsSync(path.join(filePath, "index.html"))) {
+    fs.unlinkSync(path.join(filePath, "index.html"), (err) => {
+      if (err) {
+        console.error("Error deleting path:", err);
+        return;
+      }
+    });
+
+    try {
+      fs.rmdirSync(filePath);
+      console.log("Directory removed:", filePath);
+    } catch (err) {
+      // todo: verify windows code...
+      if (err.code === "ENOTEMPTY") return;
+      console.log("Error removing directory: ", err);
+    }
+
+    await updateStatus(url, false);
+    console.log("Path removed successfully.");
+    res.json({ status: "success", path: req.path, route: url, filePath });
+  } else {
+    console.log("Path does not exists.");
+    res.json({ status: "failed", message: "Path does not exsist." });
   }
 });
 

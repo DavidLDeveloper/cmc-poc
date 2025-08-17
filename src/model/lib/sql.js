@@ -1,9 +1,10 @@
 import { Sequelize, Model, DataTypes } from "sequelize";
 
 // Create Sequelize isntance
+const dbPath = process.env.ENVIRONMENT === "dev" ? ".content/" : "dist/";
 const sequelize = new Sequelize({
   dialect: "sqlite",
-  storage: "dist/db/database.sqlite",
+  storage: `${dbPath}db/database.sqlite`,
   logging: process.env.ENVIRONMENT === "dev",
 });
 
@@ -16,11 +17,11 @@ Page.init(
     title: DataTypes.STRING,
     content: DataTypes.TEXT,
     version: DataTypes.NUMBER,
+    published: { type: DataTypes.BOOLEAN, defaultValue: false },
   },
   { sequelize, modelName: "page" }
 );
 
 // Sync model with database
-await sequelize.sync();
-
+console.log("DB initialized: ", `${dbPath}db/database.sqlite`);
 export const page = Page;

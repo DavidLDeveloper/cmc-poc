@@ -18,7 +18,10 @@ content-type: application/json
 
 {
     "content": "# Test MD 2 content\nThis is MORE MORE content. and some more, and even more",
-    "url": "/test-page2"
+    "url": "/test-page"
 }
 ###
 POST http://localhost:3000/build?url=/test-page
+
+###
+PUT http://localhost:3000/unbuild?url=/test-page

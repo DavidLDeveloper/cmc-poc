@@ -22,3 +22,10 @@ export async function updateOrCreatePage(url, content) {
     return { status: "updated", data: dbEntry };
   }
 }
+
+export async function updateStatus(url, publishedStatus) {
+  const dbEntry = await page.findOne({ where: { url } });
+  dbEntry.published = publishedStatus;
+  dbEntry.save();
+  return { status: "updated", data: dbEntry };
+}
