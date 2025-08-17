@@ -93,4 +93,21 @@ router.get("/data", async (req, res) => {
   res.json(data);
 });
 
+router.delete("/delete", async (req, res) => {
+  const { content, url } = req.body;
+  const page = await readPage(url);
+
+  if (page.published) {
+    res.status(409); // 409 -- Conflict
+    res.json({
+      status: "failed",
+      message: "Cannot delete published resource.",
+    });
+  }
+
+  await page.destroy();
+  res.status(202);
+  res.json({ status: "success" });
+});
+
 export default router;

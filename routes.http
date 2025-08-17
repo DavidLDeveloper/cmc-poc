@@ -1,8 +1,10 @@
 // Curl format:
-
+###
+// Server health
 GET http://localhost:3000/health
 
 ###
+// 404
 
 GET http://localhost:3000/notHere
 
@@ -11,8 +13,10 @@ GET http://localhost:3000/notHere
 // Test page
 GET http://localhost:3000/test-page
 ###
+// Get page data
 GET http://localhost:3000/data?url=/test-page
 ###
+// Create Page
 POST http://localhost:3000/create HTTP/1.1
 content-type: application/json
 
@@ -21,7 +25,24 @@ content-type: application/json
     "url": "/test-page"
 }
 ###
+// Publish Page
 POST http://localhost:3000/build?url=/test-page
 
 ###
+// Unpublish Page.
 PUT http://localhost:3000/unbuild?url=/test-page
+
+###
+// DELETE Page
+DELETE  http://localhost:3000/delete  HTTP/1.1
+content-type: application/json
+
+{
+    "url": "/test-page"
+}
+
+###
+// DB Backup
+GET http://localhost:3000/database/download
+
+###

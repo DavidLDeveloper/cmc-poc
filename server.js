@@ -3,11 +3,12 @@ import path from "path";
 import bodyParser from "body-parser";
 import pageController, { preview } from "./src/controller/page-controller.js";
 import editorRouter from "./src/controller/editor-controller.js";
+import dbRouter from "./src/controller/db-controller.js";
 
 const app = express();
 app.use(bodyParser.json());
 
-const __dirname = import.meta.dirname;
+export const __dirname = import.meta.dirname;
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
@@ -20,6 +21,7 @@ app.get("/health", (req, res) => {
 
 app.use(pageController);
 app.use("/editor", editorRouter);
+app.use("/database", dbRouter);
 
 // Layer 1: Content
 // Static Content Module -- dev modes
