@@ -134,10 +134,36 @@
       })
     }
   }
-    function handlePublish() {
-    console.log("PUB")
+    async function handlePublish() {
+    if (window.confirm("Publish page?")) {
+      const params = new URLSearchParams(document.location.search);
+      await window.fetch(`/build?url=${params.get("url")}`, {method: "POST"}).then(async res => {
+        const resBody = await res.json()
+        if (resBody.status === "success") {
+          alert("Page published successfully.")
+        } else {
+          throw resBody.message
+        }
+      }).catch(err => {
+        console.error(err)
+        alert("Failed to publish page. See console.")
+      })
+    }
   }
-    function handleUnpublish() {
-    console.log("UNPUB")
+    async function handleUnpublish() {
+        if (window.confirm("Unpublish page?")) {
+      const params = new URLSearchParams(document.location.search);
+      await window.fetch(`/unbuild?url=${params.get("url")}`, {method: "PUT"}).then(async res => {
+        const resBody = await res.json()
+        if (resBody.status === "success") {
+          alert("Page unpublished successfully.")
+        } else {
+          throw resBody.message
+        }
+      }).catch(err => {
+        console.error(err)
+        alert("Failed to unpublish page. See console.")
+      })
+    }
   }
 </script>
