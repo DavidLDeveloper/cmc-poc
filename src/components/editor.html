@@ -11,9 +11,12 @@
 </head>
 <main>
   <div>
-    URL: <span id="urlLabel"></span
-    ><button onclick="handleClick()">Save</button>
-  </div>
+    <button class="btn btn-soft btn-accent" onclick="handleNew()">New</button>
+    <button class="btn btn-soft btn-accent" onclick="handleSave()">Save</button>
+    <button class="btn btn-soft btn-accent" onclick="handlePublish()">Publish</button>
+    <button class="btn btn-soft btn-accent" onclick="handleUnpublish()">Unpublish</button>
+    <button class="btn btn-soft btn-accent" onclick="handleDelete()">Delete</button>
+  <h1>URL: <span id="urlLabel"></span></h1>
   <div id="toolbar"></div>
   <div id="editor"></div>
   <textarea id="txt">{contents}</textarea>
@@ -50,18 +53,23 @@
 
 <script>
   const params = new URLSearchParams(document.location.search);
-  const urlLabel = document.getElementById("urlLabel");
-  urlLabel.innerText = params.get("url");
-
   async function updateContent() {
     const resp = await window.fetch(`/data?url=${params.get("url")}`);
     const data = await resp.json();
     tinyMDE.setContent(data.content);
-  }
+  } 
+      
+  const urlLabel = document.getElementById("urlLabel");
+  urlLabel.innerText = params.get("url");
   updateContent();
+
+
+
+
+
 </script>
 <script>
-  async function handleClick() {
+  async function handleSave() {
     if (window.confirm("Overwrite existing content?")) {
       await window.fetch("/create", {
         headers: { "content-type": "application/json" },
@@ -72,5 +80,64 @@
         }),
       });
     }
+  }
+
+  async function handleNew() {
+    let url = window.prompt("Enter new URL:")
+    const urlPattern = /^\/.*/;
+    if (!urlPattern.test(url)) alert("Invalid URL:\nAllowed pattern examples include '/pagename', '/this123/more-text', etc.")
+      
+      const res = await window.fetch(`/data?url=${url}`).then(async res => {
+        const body = await res.json()
+        return body
+      })
+      if (!res) {
+      await window.fetch("/create", {
+        headers: { "content-type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({
+          url: url,
+          content: "# Page Title\nWelcome to your new page.",
+        }),
+      }).then((res) => {
+      window.location.assign(`/editor?url=${url}`)
+      })
+    } else {
+      await alert("Page already exists.\nRerouting to existing content.")
+         window.location.assign(`/editor?url=${url}`)
+    }
+
+  }
+    async function handleDelete() {
+    if (window.confirm("Delete content?\nThis cannot be undone.")) {
+        const params = new URLSearchParams(document.location.search);
+
+      const pageData = await window.fetch(`/data?url=${params.get("url")}`).then(async res => {
+        const body = await res.json()
+        return body
+      })
+      
+      if (pageData.published) {
+        alert("Cannot delete published content.")
+        return
+      }
+
+      await window.fetch(`/delete`, {
+        headers: { "content-type": "application/json" },
+        method: "DELETE",
+        body: JSON.stringify({
+          url: params.get("url"),
+        }),
+      }).then(() => {
+        alert("Content deleted.")
+        window.location.assign('/')
+      })
+    }
+  }
+    function handlePublish() {
+    console.log("PUB")
+  }
+    function handleUnpublish() {
+    console.log("UNPUB")
   }
 </script>

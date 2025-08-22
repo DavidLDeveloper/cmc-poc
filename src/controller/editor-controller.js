@@ -10,13 +10,14 @@ const editorRouter = express.Router();
 // Build a page into ./dist/static
 editorRouter.get("/", async (req, res) => {
   const { url } = req.query;
+  if (!url) res.json({ status: "failed", message: "'url' param is required." });
   const data = await readPage(url);
-  const contentBuffer = fs.readFileSync(
-    path.join("src/components/editor.html")
-  );
-  const content = contentBuffer.toString();
-  const hydratedContent = content.replace("{content}", String(data.content));
   if (data) {
+    const contentBuffer = fs.readFileSync(
+      path.join("src/components/editor.html")
+    );
+    const content = contentBuffer.toString();
+    const hydratedContent = content.replace("{content}", String(data.content));
     const html = createPageHTML(null, hydratedContent);
     res.send(html);
   } else {
