@@ -13,9 +13,16 @@
   <div>
     <button class="btn btn-soft btn-accent" onclick="handleNew()">New</button>
     <button class="btn btn-soft btn-accent" onclick="handleSave()">Save</button>
-    <button class="btn btn-soft btn-accent" onclick="handlePublish()">Publish</button>
-    <button class="btn btn-soft btn-accent" onclick="handleUnpublish()">Unpublish</button>
-    <button class="btn btn-soft btn-accent" onclick="handleDelete()">Delete</button>
+    <button class="btn btn-soft btn-accent" onclick="handlePublish()">
+      Publish
+    </button>
+    <button class="btn btn-soft btn-accent" onclick="handleUnpublish()">
+      Unpublish
+    </button>
+    <button class="btn btn-soft btn-accent" onclick="handleDelete()">
+      Delete
+    </button>
+  </div>
   <h1>URL: <span id="urlLabel"></span></h1>
   <div id="toolbar"></div>
   <div id="editor"></div>
@@ -57,16 +64,13 @@
     const resp = await window.fetch(`/data?url=${params.get("url")}`);
     const data = await resp.json();
     tinyMDE.setContent(data.content);
-  } 
-      
+  }
+
   const urlLabel = document.getElementById("urlLabel");
   urlLabel.innerText = params.get("url");
   updateContent();
-
-
-
-
-
+  const nav = document.getElementById("nav_container");
+  nav.style.visibility = "hidden";
 </script>
 <script>
   async function handleSave() {
@@ -83,87 +87,103 @@
   }
 
   async function handleNew() {
-    let url = window.prompt("Enter new URL:")
+    let url = window.prompt("Enter new URL:");
     const urlPattern = /^\/.*/;
-    if (!urlPattern.test(url)) alert("Invalid URL:\nAllowed pattern examples include '/pagename', '/this123/more-text', etc.")
-      
-      const res = await window.fetch(`/data?url=${url}`).then(async res => {
-        const body = await res.json()
-        return body
-      })
-      if (!res) {
-      await window.fetch("/create", {
-        headers: { "content-type": "application/json" },
-        method: "POST",
-        body: JSON.stringify({
-          url: url,
-          content: "# Page Title\nWelcome to your new page.",
-        }),
-      }).then((res) => {
-      window.location.assign(`/editor?url=${url}`)
-      })
-    } else {
-      await alert("Page already exists.\nRerouting to existing content.")
-         window.location.assign(`/editor?url=${url}`)
+    if (!urlPattern.test(url)) {
+      alert(
+        "Invalid URL:\nAllowed pattern examples include '/pagename', '/this123/more-text', etc."
+      );
+      return;
     }
 
+    const res = await window.fetch(`/data?url=${url}`).then(async (res) => {
+      const body = await res.json();
+      return body;
+    });
+    if (!res) {
+      await window
+        .fetch("/create", {
+          headers: { "content-type": "application/json" },
+          method: "POST",
+          body: JSON.stringify({
+            url: url,
+            content: "# Page Title\nWelcome to your new page.",
+          }),
+        })
+        .then((res) => {
+          window.location.assign(`/editor?url=${url}`);
+        });
+    } else {
+      await alert("Page already exists.\nRerouting to existing content.");
+      window.location.assign(`/editor?url=${url}`);
+    }
   }
-    async function handleDelete() {
+  async function handleDelete() {
     if (window.confirm("Delete content?\nThis cannot be undone.")) {
-        const params = new URLSearchParams(document.location.search);
+      const params = new URLSearchParams(document.location.search);
 
-      const pageData = await window.fetch(`/data?url=${params.get("url")}`).then(async res => {
-        const body = await res.json()
-        return body
-      })
-      
+      const pageData = await window
+        .fetch(`/data?url=${params.get("url")}`)
+        .then(async (res) => {
+          const body = await res.json();
+          return body;
+        });
+
       if (pageData.published) {
-        alert("Cannot delete published content.")
-        return
+        alert("Cannot delete published content.");
+        return;
       }
 
-      await window.fetch(`/delete`, {
-        headers: { "content-type": "application/json" },
-        method: "DELETE",
-        body: JSON.stringify({
-          url: params.get("url"),
-        }),
-      }).then(() => {
-        alert("Content deleted.")
-        window.location.assign('/')
-      })
+      await window
+        .fetch(`/delete`, {
+          headers: { "content-type": "application/json" },
+          method: "DELETE",
+          body: JSON.stringify({
+            url: params.get("url"),
+          }),
+        })
+        .then(() => {
+          alert("Content deleted.");
+          window.location.assign("/");
+        });
     }
   }
-    async function handlePublish() {
+  async function handlePublish() {
     if (window.confirm("Publish page?")) {
       const params = new URLSearchParams(document.location.search);
-      await window.fetch(`/build?url=${params.get("url")}`, {method: "POST"}).then(async res => {
-        const resBody = await res.json()
-        if (resBody.status === "success") {
-          alert("Page published successfully.")
-        } else {
-          throw resBody.message
-        }
-      }).catch(err => {
-        console.error(err)
-        alert("Failed to publish page. See console.")
-      })
+      await window
+        .fetch(`/build?url=${params.get("url")}`, { method: "POST" })
+        .then(async (res) => {
+          const resBody = await res.json();
+          if (resBody.status === "success") {
+            alert("Page published successfully.");
+          } else {
+            throw resBody.message;
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          alert("Failed to publish page. See console.");
+        });
     }
   }
-    async function handleUnpublish() {
-        if (window.confirm("Unpublish page?")) {
+  async function handleUnpublish() {
+    if (window.confirm("Unpublish page?")) {
       const params = new URLSearchParams(document.location.search);
-      await window.fetch(`/unbuild?url=${params.get("url")}`, {method: "PUT"}).then(async res => {
-        const resBody = await res.json()
-        if (resBody.status === "success") {
-          alert("Page unpublished successfully.")
-        } else {
-          throw resBody.message
-        }
-      }).catch(err => {
-        console.error(err)
-        alert("Failed to unpublish page. See console.")
-      })
+      await window
+        .fetch(`/unbuild?url=${params.get("url")}`, { method: "PUT" })
+        .then(async (res) => {
+          const resBody = await res.json();
+          if (resBody.status === "success") {
+            alert("Page unpublished successfully.");
+          } else {
+            throw resBody.message;
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          alert("Failed to unpublish page. See console.");
+        });
     }
   }
 </script>
