@@ -23,5 +23,19 @@ Page.init(
 );
 
 // Sync model with database
+await sequelize.sync();
+
+// Create demo entry if db is empty:
+if ((await Page.count()) === 0) {
+  console.log("Creating Demo page...");
+  await Page.create({
+    url: "/demo",
+    title: "Demo page",
+    version: 1,
+    published: false,
+    content: "# Demo Page\nSelect 'New' to create a new page.",
+  });
+}
+
 console.log("DB initialized: ", `${dbPath}db/database.sqlite`);
 export const page = Page;
